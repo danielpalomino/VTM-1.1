@@ -8,3 +8,7 @@ lib
 nbproject
 output.txt
 .svn
+.cproject
+.editorconfig
+.project
+.pydevproject
