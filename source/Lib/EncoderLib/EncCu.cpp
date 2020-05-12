@@ -528,7 +528,6 @@ void EncCu::xCompressCU( CodingStructure *&tempCS, CodingStructure *&bestCS, Par
     }
     else if( currTestMode.type == ETM_INTRA )
     {
-        fprintf(stdout,"\nFor partition %dx%d in pos y=%d, x=%d",partitioner.currArea().lwidth(),partitioner.currArea().lheight(),partitioner.currArea().ly(),partitioner.currArea().lx());
       xCheckRDCostIntra( tempCS, bestCS, partitioner, currTestMode );
     }
     else if( currTestMode.type == ETM_IPCM )

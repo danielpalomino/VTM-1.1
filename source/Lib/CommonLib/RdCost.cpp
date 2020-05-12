@@ -2774,7 +2774,6 @@ Distortion RdCost::xGetHADs( const DistParam &rcDtParam )
 
   if( rcDtParam.isQtbt && iCols > iRows && ( iRows & 7 ) == 0 && ( iCols & 15 ) == 0 )
   {
-      fprintf(stdout,"\nCalling xCalcHADs16x8 %d times",(iRows*iCols)/128);
     for( y = 0; y < iRows; y += 8 )
     {
       for( x = 0; x < iCols; x += 16 )
@@ -2787,7 +2786,6 @@ Distortion RdCost::xGetHADs( const DistParam &rcDtParam )
   }
   else if( rcDtParam.isQtbt && iCols < iRows && ( iCols & 7 ) == 0 && ( iRows & 15 ) == 0 )
   {
-      fprintf(stdout,"\nCalling xCalcHADs8x16 %d times",(iRows*iCols)/128);
     for( y = 0; y < iRows; y += 16 )
     {
       for( x = 0; x < iCols; x += 8 )
@@ -2800,7 +2798,6 @@ Distortion RdCost::xGetHADs( const DistParam &rcDtParam )
   }
   else if( rcDtParam.isQtbt && iCols > iRows && ( iRows & 3 ) == 0 && ( iCols & 7 ) == 0 )
   {
-      fprintf(stdout,"\nCalling xCalcHADs8x4 %d times",(iRows*iCols)/32);
     for( y = 0; y < iRows; y += 4 )
     {
       for( x = 0; x < iCols; x += 8 )
@@ -2813,7 +2810,6 @@ Distortion RdCost::xGetHADs( const DistParam &rcDtParam )
   }
   else if( rcDtParam.isQtbt && iCols < iRows && ( iCols & 3 ) == 0 && ( iRows & 7 ) == 0 )
   {
-      fprintf(stdout,"\nCalling xCalcHADs4x8 %d times",(iRows*iCols)/32);
     for( y = 0; y < iRows; y += 8 )
     {
       for( x = 0; x < iCols; x += 4 )
@@ -2826,7 +2822,6 @@ Distortion RdCost::xGetHADs( const DistParam &rcDtParam )
   }
   else if( ( iRows % 8 == 0 ) && ( iCols % 8 == 0 ) )
   {
-      fprintf(stdout,"\nCalling xCalcHADs8x8 %d times",(iRows*iCols)/64);
     Int  iOffsetOrg = iStrideOrg << 3;
     Int  iOffsetCur = iStrideCur << 3;
     for( y = 0; y < iRows; y += 8 )
@@ -2841,7 +2836,6 @@ Distortion RdCost::xGetHADs( const DistParam &rcDtParam )
   }
   else if( ( iRows % 4 == 0 ) && ( iCols % 4 == 0 ) )
   {
-      fprintf(stdout,"\nCalling xCalcHADs4x4 %d times",(iRows*iCols)/16);
     Int  iOffsetOrg = iStrideOrg << 2;
     Int  iOffsetCur = iStrideCur << 2;
 
@@ -2857,7 +2851,6 @@ Distortion RdCost::xGetHADs( const DistParam &rcDtParam )
   }
   else if( ( iRows % 2 == 0 ) && ( iCols % 2 == 0 ) )
   {
-      fprintf(stdout,"\nCalling xCalcHADs2x2");
     Int  iOffsetOrg = iStrideOrg << 1;
     Int  iOffsetCur = iStrideCur << 1;
     for( y = 0; y < iRows; y += 2 )

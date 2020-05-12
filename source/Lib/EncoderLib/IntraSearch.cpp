@@ -375,8 +375,6 @@ Void IntraSearch::estIntraPredLumaQT( CodingUnit &cu, Partitioner &partitioner )
             {
               continue;
             }
-            
-            fprintf(stdout,"\nTesting intra mode %d",modeIdx);
 
             bSatdChecked[uiMode] = true;
 

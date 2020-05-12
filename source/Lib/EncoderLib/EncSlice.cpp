@@ -1361,7 +1361,6 @@ void EncSlice::encodeCtus( Picture* pcPic, const Bool bCompressEntireSlice, cons
   // for every CTU in the slice segment (may terminate sooner if there is a byte limit on the slice-segment)
   for( UInt ctuTsAddr = startCtuTsAddr; ctuTsAddr < boundingCtuTsAddr; ctuTsAddr++ )
   {
-      fprintf(stdout,"\nFor CTU %d",ctuTsAddr);
 #if HEVC_TILES_WPP
     const UInt ctuRsAddr = tileMap.getCtuTsToRsAddrMap(ctuTsAddr);
 #else
