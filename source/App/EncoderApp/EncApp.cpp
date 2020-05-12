@@ -45,6 +45,9 @@
 #include "EncApp.h"
 #include "EncoderLib/AnnexBwrite.h"
 
+//DANIEL BEGIN
+#include "CommonLib/approx.h"
+//DANIEL END
 using namespace std;
 
 //! \ingroup EncoderApp
@@ -552,7 +555,42 @@ Void EncApp::encode()
   xCreateLib( recBufList
              );
   xInitLib(m_isField);
-
+  
+//  DANIEL BEGIN
+//  pointer to begin and end of intra neighbors buffer Y, Cb, Cr (unfiltered and filtered, i.e., with smoothing)
+//  the memory allocation is performed in the above function xInitLib
+//  this is the point where we can insert add_approx for all buffers
+//  the remove_approx should be called only after the encoding of all frames, i.e, after while(!bEos)
+  Pel *beginYunfiltered, *endYunfiltered;
+//  Pel *beginYfiltered, *endYfiltered;
+  Pel *beginCbunfiltered, *endCbunfiltered;
+//  Pel *beginCbfiltered, *endCbfiltered;
+  Pel *beginCrunfiltered, *endCrunfiltered;
+//  Pel *beginCrfiltered, *endCrfiltered;
+  
+  int buffers_size = ((MAX_CU_SIZE * 2 + 1) * (MAX_CU_SIZE * 2 + 1));
+  
+  beginYunfiltered = m_cEncLib.getIntraSearch()->getPredictorPtr(COMPONENT_Y,false);
+  endYunfiltered = beginYunfiltered + buffers_size - 1;
+//  beginYfiltered = m_cEncLib.getIntraSearch()->getPredictorPtr(COMPONENT_Y,true);
+//  endYfiltered = beginYfiltered + buffers_size - 1;
+  set_write_ber(0.0);
+  set_read_ber(0.0);  
+  add_approx((unsigned long long)beginYunfiltered, (unsigned long long)endYunfiltered);  
+  
+  beginCbunfiltered = m_cEncLib.getIntraSearch()->getPredictorPtr(COMPONENT_Cb,false);
+  endCbunfiltered = beginCbunfiltered + buffers_size - 1;
+//  beginCbfiltered = m_cEncLib.getIntraSearch()->getPredictorPtr(COMPONENT_Cb,true);
+//  endCbfiltered = beginCbfiltered + buffers_size - 1;
+  add_approx((unsigned long long)beginCbunfiltered, (unsigned long long)endCbunfiltered);
+  
+  beginCrunfiltered = m_cEncLib.getIntraSearch()->getPredictorPtr(COMPONENT_Cr,false);
+  endCrunfiltered = beginCrunfiltered + buffers_size - 1;
+//  beginCrfiltered = m_cEncLib.getIntraSearch()->getPredictorPtr(COMPONENT_Cr,true);
+//  endCrfiltered = beginCrfiltered + buffers_size - 1;
+  add_approx((unsigned long long)beginCrunfiltered, (unsigned long long)endCrunfiltered);  
+  //DANIEL END
+  
   printChromaFormat();
 
   // main encoder loop
@@ -614,6 +652,12 @@ Void EncApp::encode()
       m_cVideoIOYuvInputFile.skipFrames(m_temporalSubsampleRatio-1, m_iSourceWidth - m_aiPad[0], m_iSourceHeight - m_aiPad[1], m_InputChromaFormatIDC);
     }
   }
+  
+  //DANIEL BEGIN
+  remove_approx((unsigned long long)beginYunfiltered, (unsigned long long)endYunfiltered);
+  remove_approx((unsigned long long)beginCbunfiltered, (unsigned long long)endCbunfiltered);
+  remove_approx((unsigned long long)beginCrunfiltered, (unsigned long long)endCrunfiltered);
+  //DANIEL END
 
   m_cEncLib.printSummary(m_isField);
 

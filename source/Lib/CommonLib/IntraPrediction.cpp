@@ -46,6 +46,12 @@
 
 #include <memory.h>
 
+//DANIEL BEGIN
+#include "approx.h"
+extern Double m_intraReadBER;                                      ///< BER for memory readings on intra neighbor buffer
+extern Double m_intraWriteBER;                                     ///< BER for memory writings on intra neighbor buffer
+//DANIEL END
+
 //! \ingroup CommonLib
 //! \{
 
@@ -200,6 +206,15 @@ void IntraPrediction::predIntraAng( const ComponentID compId, PelBuf &piPred, co
   const Bool enableEdgeFilters = !(CU::isRDPCMEnabled( *pu.cu ) && pu.cu->transQuantBypass);
 #endif
   Pel *ptrSrc = getPredictorPtr( compID, useFilteredPredSamples );
+  
+  //DANIEL BEGIN
+  //read ber ON for the prediction operations that will read samples from the neighbor buffer
+  //write ber ON for the first reads of the neighbor samples for the prediction operations
+  //maybe each memory buffer (there are 3 of them, Y,Cb,Cr, unfiltered) should have its on read BER
+  set_read_ber(m_intraReadBER);
+  set_write_ber(m_intraWriteBER);
+  //DANIEL END
+  
 
   {
     switch( uiDirMode )
@@ -215,6 +230,10 @@ void IntraPrediction::predIntraAng( const ComponentID compId, PelBuf &piPred, co
 #endif
     }
   }
+  //DANIEL BEGIN
+  set_write_ber(0.0);
+  set_read_ber(0.0);
+  //DANIEL END
 }
 
 
@@ -589,13 +608,27 @@ Void IntraPrediction::initIntraPatternChType(const CodingUnit &cu, const CompAre
   Pel *refBufUnfiltered   = m_piYuvExt[area.compID][PRED_BUF_UNFILTERED];
   Pel *refBufFiltered     = m_piYuvExt[area.compID][PRED_BUF_FILTERED];
 
+  //DANIEL BEGIN
+  //write ber must be ON for the xFillReferenceSamples function where the writing on neighbor buffer occurs
+  //it also needs to be ON for the xFilterReferencesSamples function, since first reads are performed there
+  //maybe each memory buffer (there are 3 of them, Y,Cb,Cr, unfiltered) should have its on write BER
+  set_write_ber(m_intraWriteBER);
+  //DANIEL END  
   // ----- Step 1: unfiltered reference samples -----
   xFillReferenceSamples( cs.picture->getRecoBuf( area ), refBufUnfiltered, area, cu );
+  //DANIEL BEGIN
+  //read ber must be ON when the neighbor samples buffer will be read by the filtering operations
+  set_read_ber(m_intraReadBER);
+  //DANIEL END
   // ----- Step 2: filtered reference samples -----
   if( bFilterRefSamples )
   {
     xFilterReferenceSamples( refBufUnfiltered, refBufFiltered, area, *cs.sps );
   }
+    //DANIEL BEGIN
+  set_write_ber(0.0);
+  set_read_ber(0.0);
+  //DANIE END
 }
 
 void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBufUnfiltered, const CompArea &area, const CodingUnit &cu )
@@ -644,6 +677,12 @@ void IntraPrediction::xFillReferenceSamples( const CPelBuf &recoBuf, Pel* refBuf
   // ----- Step 2: fill reference samples (depending on neighborhood) -----
   CHECK( predStride * predStride > m_iYuvExtSize, "Reference sample area not supported" );
 
+  //DANIEL BEGIN
+  //srcBuf is the reconstructed buffer
+  //ptrDst is the neighbors buffer of unfiltered references 
+  //(pointer came from refBufUnfiltered that came from m_piYuvExt variable)
+  //in fact, when writing in the ptrDst buffer we are writing in the m_piYuvExt buffer
+  //DANIEL END
   const Pel*  srcBuf    = recoBuf.buf;
   const int   srcStride = recoBuf.stride;
         Pel*  ptrDst    = refBufUnfiltered;

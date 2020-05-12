@@ -56,7 +56,10 @@
 using namespace std;
 namespace po = df::program_options_lite;
 
-
+  //DANIEL BEGIN
+  Double m_intraReadBER;                                      ///< BER for memory readings on intra neighbor buffer
+  Double m_intraWriteBER;                                     ///< BER for memory writings on intra neighbor buffer
+  //DANIEL END
 
 enum ExtendedProfileName // this is used for determining profile strings, where multiple profiles map to a single profile idc with various constraint flag combinations
 {
@@ -816,6 +819,11 @@ Bool EncAppCfg::parseCfg( Int argc, TChar* argv[] )
   // Unit definition parameters
   ("MaxCUWidth",                                      m_uiMaxCUWidth,                                     64u)
   ("MaxCUHeight",                                     m_uiMaxCUHeight,                                    64u)
+  //DANIEL BEGIN
+  //memory approximation parameters
+  ("IntraReadBER",                                    m_intraReadBER,                                ( Double )0.0, "Bit Error Rate for memory readings on Intra neighbors buffer m_piYuvExt")
+  ("IntraWriteBER",                                   m_intraWriteBER,                               ( Double )0.0, "Bit Error Rate for memory writing on Intra neighbors buffer m_piYuvExt")
+  //DANIEL END
   // todo: remove defaults from MaxCUSize
   ("MaxCUSize,s",                                     m_uiMaxCUWidth,                                     64u, "Maximum CU size")
   ("MaxCUSize,s",                                     m_uiMaxCUHeight,                                    64u, "Maximum CU size")
